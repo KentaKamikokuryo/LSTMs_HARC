@@ -51,6 +51,7 @@ class BasicLSTM(IModel):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+        model.summary()
 
         return model
 
@@ -82,6 +83,7 @@ class CnnLSTM(IModel):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+        model.summary()
 
         return model
 
@@ -113,6 +115,7 @@ class ConvLSTM(IModel):
         model.add(Dense(100, activation='relu'))
         model.add(Dense(self.n_outputs, activation='softmax'))
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+        model.summary()
 
         return model
 

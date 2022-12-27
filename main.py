@@ -19,7 +19,7 @@ n_timesteps = X_train.shape[1]
 n_features = X_train.shape[2]
 n_outputs = y_train.shape[1]
 
-factory = Factory(model_name=Model.conv_lstm,
+factory = Factory(model_name=Model.cnn_lstm,
                   n_timesteps=n_timesteps,
                   n_features=n_features,
                   n_outputs=n_outputs)
