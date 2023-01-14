@@ -11,14 +11,14 @@ class Data:
 
         self.pathInfo = pathInfo
 
-        self._X_train, self._y_train = self._load_dataset_group(self.pathInfo.file_path_train,
-                                                                self.pathInfo.filenames_train)
+        self._X_train, self._y_train, self._subject_train = self._load_dataset_group(self.pathInfo.file_path_train,
+                                                                                     self.pathInfo.filenames_train)
 
-        self._X_test, self._y_test = self._load_dataset_group(self.pathInfo.file_path_test,
-                                                              self.pathInfo.filenames_test)
+        self._X_test, self._y_test, self._subject_test = self._load_dataset_group(self.pathInfo.file_path_test,
+                                                                                  self.pathInfo.filenames_test)
 
         # one hot encode y
-        self._one_hot_encode()
+        # self._one_hot_encode()
 
         self._class_names = ["Walking", "Walking Upstairs", "Waking Downstairs",
                              "Sitting", "Standing", "Laying"]
@@ -38,17 +38,21 @@ class Data:
 
         if "test" in file_path:
             y = Data.load_file(self.pathInfo.path_data + "test\\y_test.txt")
+            subjects = Data.load_file(self.pathInfo.path_data + "test\\subject_test.txt")
 
         elif "train" in file_path:
             y = Data.load_file(self.pathInfo.path_data + "train\\y_train.txt")
+            subjects = Data.load_file(self.pathInfo.path_data + "train\\subject_train.txt")
 
         else:
             sys.exit(1)
 
+        subjects = subjects.flatten()
+
         # zero offset class values
         y = y - 1
 
-        return X, y
+        return X, y, subjects
 
     @staticmethod
     def load_file(file_path):
@@ -62,3 +66,7 @@ class Data:
     @property
     def class_names(self):
         return self._class_names
+
+    @property
+    def subject_train_test(self):
+        return self._subject_train, self._subject_test

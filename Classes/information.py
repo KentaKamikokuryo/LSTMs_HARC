@@ -6,10 +6,12 @@ class PathInfo:
     def __init__(self):
 
         self.cwd = os.getcwd()
-        # self.cwd = ""
+        self.cwd = "C:\\Users\\Kenta Kamikokuryo\\Desktop\\Research\\GIT_Projects\\LSTMs_HARC"
         print("cwd: {0}".format(self.cwd))
 
         self._set_data_path()
+
+        self._set_save_folder()
 
     def _set_data_path(self):
 
@@ -23,6 +25,40 @@ class PathInfo:
         self._file_path_train, self._filenames_train = Utilities.load_filenames(group="train",
                                                                                 prefix=self._path_data)
         print("path for file train: {0}".format(self._file_path_train))
+
+    def _set_save_folder(self):
+
+        self._folder_ML = self.cwd + "\\ML\\"
+        if not (os.path.exists(self._folder_ML)):
+            os.makedirs(self._folder_ML)
+
+        self._path_figure = self._folder_ML + "Figures\\"
+        if not (os.path.exists(self._path_figure)):
+            os.makedirs(self._path_figure)
+
+        self._path_search = self._folder_ML + "Search_Models\\"
+        if not (os.path.exists(self._path_search)):
+            os.makedirs(self._path_search)
+
+        self._path_results = self._folder_ML + "Results\\"
+        if not (os.path.exists(self._path_results)):
+            os.makedirs(self._path_results)
+
+    def set_path_figure_model(self, model_name):
+
+        path_figure_model = self._path_figure + model_name + "\\"
+        if not (os.path.exists(path_figure_model)):
+            os.makedirs(path_figure_model)
+
+        return path_figure_model
+
+    def set_path_search_model(self, model_name):
+
+        path_search_model = self._path_search + model_name + "\\"
+        if not (os.path.exists(path_search_model)):
+            os.makedirs(path_search_model)
+
+        return path_search_model
 
     @property
     def path_data(self):
@@ -43,6 +79,11 @@ class PathInfo:
     @property
     def filenames_train(self):
         return self._filenames_train
+
+    @property
+    def path_results(self):
+        return self._path_results
+
 
 class Utilities:
 
