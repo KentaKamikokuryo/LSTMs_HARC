@@ -84,6 +84,10 @@ class PathInfo:
     def path_results(self):
         return self._path_results
 
+    @property
+    def path_figure(self):
+        return self._path_figure
+
 
 class Utilities:
 

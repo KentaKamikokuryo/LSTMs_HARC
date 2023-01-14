@@ -11,6 +11,7 @@ import sys
 import logging as log
 from keras.utils import to_categorical
 from keras.utils.vis_utils import plot_model
+from Classes.plot import Utilities
 
 
 def output_score(metric, y_true, y_pred):
@@ -45,7 +46,7 @@ def output_score(metric, y_true, y_pred):
 
 class Manager:
 
-    def __init__(self, interface: IBehavior):
+    def __init__(self, interface: IBehavior, n_K_fold: int, verpose: int = 1):
 
         # Set the interface (code behavior)
         self.interface = interface
@@ -56,14 +57,14 @@ class Manager:
 
         self.pathInfo = PathInfo()
 
-        self.n_K_fold = 5
+        self.n_K_fold = n_K_fold
 
-        self.verbose = 0
-
-        # self.REPEATS = 4
+        self.verbose = verpose
 
         # Set the model name for validating
         self.model_info = ModelInfo()
+
+        self.plot_utils = Utilities()
 
         self._set_data()
 
@@ -79,7 +80,7 @@ class Manager:
 
     def _set_hyper(self, model_name):
 
-        self.ranked = Ranked(model_name=model_name,
+        self.ranked = Ranked(model_name=model_name.name,
                              metric=self.metric,
                              path=self.path_search_model)
 
@@ -154,36 +155,36 @@ class Manager:
 
     def _test(self, hyper_model):
 
+        y_train = to_categorical(self.y_train)
+        # self.y_test = to_categorical(self.y_test)
+
         model_base = self._generate_model_base(hyper_model=hyper_model,
                                                X_fit=self.X_train,
-                                               y_fit=self.y_train)
+                                               y_fit=y_train)
 
         X_train, X_test = model_base.fit_data_on_model(X_train=self.X_train,
                                                        X_test=self.X_test)
-
-        self.y_train = to_categorical(self.y_train)
-        # self.y_test = to_categorical(self.y_test)
 
         scores = []
 
         dl_model = model_base.create()
 
-        dl_model.fit(x=X_train, y=self.y_train,
+        dl_model.fit(x=X_train, y=y_train,
                      epochs=hyper_model["epoch"],
                      batch_size=hyper_model["batch_size"],
                      verbose=self.verbose)
 
-        y_pred = dl_model.predict(self.X_test)
+        y_pred = dl_model.predict(X_test)
         y_pred = np.argmax(y_pred, axis=1)
-        self.y_test = self.y_test.flatten()
+        y_test = self.y_test.flatten().copy()
 
-        score = output_score(metric=self.metric, y_true=self.y_test, y_pred=y_pred)
+        score = output_score(metric=self.metric, y_true=y_test, y_pred=y_pred)
         scores.append(score)
 
         scores_all_metric = []
         for metric in self.metrics:
 
-            score_temp = output_score(metric=metric, y_true=self.y_test, y_pred=y_pred)
+            score_temp = output_score(metric=metric, y_true=y_test, y_pred=y_pred)
             scores_all_metric.append(score_temp)
 
         tmp = pd.DataFrame({hyper_model["model_name"]: scores_all_metric}, index=self.metrics)
@@ -197,7 +198,26 @@ class Manager:
         plot_model(dl_model, to_file=self.path_figure_model + hyper_model["model_name"] + "_model.png",
                    show_shapes=True, show_layer_names=True)
 
+        # TODO: It's not working properly
+        # # For drawing classification report
+        # classification_result = metrics.classification_report(y_true=self.y_test, y_pred=y_pred,
+        #                                                       target_names=self.class_name)
+        # fig = self.plot_utils.plot_classification_report(classification_report=classification_result,
+        #                                                  title="Classification report - " + hyper_model["model_name"])
+        # self.plot_utils.save_figure(fig=fig,
+        #                             path=self.path_figure_model,
+        #                             figure_name=hyper_model["model_name"] + "_classification_report",
+        #                             close_figure=True)
 
+        # For plotting confusion matrix
+        fig = self.plot_utils.plot_confusion_matrix(y_test=y_test,
+                                                    y_pred=y_pred,
+                                                    index=self.class_name,
+                                                    model_name=hyper_model["model_name"])
+        self.plot_utils.save_figure(fig=fig,
+                                    path=self.path_figure_model,
+                                    figure_name=hyper_model["model_name"] + "_confusion_matrix",
+                                    close_figure=True)
 
         return metric_score_mean, metric_score_std
 
@@ -239,6 +259,12 @@ class Manager:
                                   mean=metric_mean,
                                   std=metric_std)
 
+        fig = self.plot_utils.plot_bar_classification_scores(ldf=self._ldf)
+        self.plot_utils.save_figure(fig=fig,
+                                    path=self.pathInfo.path_figure,
+                                    figure_name="classification_scores",
+                                    close_figure=True)
+
         ranked_comparison.ranked(display=True, save=self.interface.save_best_comparison())
         ranked_comparison.save_best_hyperparameter()
 
@@ -256,26 +282,19 @@ class Manager:
 def main():
 
     code_behaviors = [CodeBehavior.HPT, CodeBehavior.MC, CodeBehavior.MR]
-    Is = code_behaviors[:2]
+    Is = code_behaviors[1:2]
+
+    N_FOLD = 2
 
     for I in Is:
 
         code_behavior_fac = CodeBehaviorFactory(code_behavior_name=I.value)
         interface = code_behavior_fac.create()
 
-        manager = Manager(interface=interface)
+        manager = Manager(interface=interface, n_K_fold=N_FOLD, verpose=1)
         manager.run()
 
 
 if __name__ == "__main__":
 
     main()
-
-
-
-
-
-
-
-
-

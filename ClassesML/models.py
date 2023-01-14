@@ -53,7 +53,7 @@ class BasicLSTM(IModel):
         model.add(Dense(100, activation=self.hyper_model["activation"]))
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer=self.hyper_model["optimizer"])
-        model.summary()
+        # model.summary()
 
         return model
 
@@ -86,7 +86,7 @@ class CnnLSTM(IModel):
         model.add(Dense(100, activation=self.hyper_model["activation"]))
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer=self.hyper_model["optimizer"])
-        model.summary()
+        # model.summary()
 
         return model
 
@@ -119,7 +119,7 @@ class ConvLSTM(IModel):
         model.add(Dense(100, activation=self.hyper_model["activation"]))
         model.add(Dense(self.n_outputs, activation='softmax'))
         model.compile(loss="categorical_crossentropy", optimizer=self.hyper_model["optimizer"])
-        model.summary()
+        # model.summary()
 
         return model
 

@@ -131,6 +131,9 @@ class Utilities:
             ax.invert_yaxis()
             ax.xaxis.tick_top()
 
+        plt.xticks(rotation=45)
+        plt.yticks(rotation=45)
+
             # resize
         fig = plt.gcf()
         # fig.set_size_inches(cm2inch(40, 20))
@@ -160,7 +163,7 @@ class Utilities:
             t = line.strip().split()
             if len(t) < 2: continue
             classes.append(t[0])
-            v = [float(x) for x in t[1: len(t) - 1]]
+            v = [x for x in t[1: len(t) - 1]]
             support.append(int(t[-1]))
             class_names.append(t[0])
             print(v)
@@ -196,7 +199,8 @@ class Utilities:
         fig, ax = plt.subplots(1, 1, figsize=(10, 8))
 
         frame_scores.plot.bar(ax=ax, cmap="RdYlBu", edgecolor="black")
-        ax.legend(loc = "best")
+        plt.xticks(rotation=45)
+        ax.legend(loc="best")
         ax.set_ylabel("Score")
         ax.set_xlabel("Models")
         ax.set_title("Cross validation model benchmark")
@@ -227,7 +231,7 @@ class Utilities:
     def plot_confusion_matrix(y_test, y_pred, index, model_name):
 
         plt.ioff()
-        fig = plt.figure(figsize=(18, 18))
+        fig = plt.figure(figsize=(20, 20))
         ax = fig.add_subplot(1, 1, 1)
 
         matrix = confusion_matrix(y_test, y_pred)
