@@ -8,7 +8,8 @@ class Ranked():
     mean_list_sorted: list
     std_list_sorted: list
 
-    def __init__(self, model_name, path: str="",
+    def __init__(self, model_name,
+                 path: str="",
                  metric: str = "f1",
                  sort_type: str="ascending",
                  metric_type: str="accuracy"):

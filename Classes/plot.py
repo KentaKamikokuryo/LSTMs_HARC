@@ -19,6 +19,40 @@ class Utilities:
         plt.rcParams['ytick.direction'] = 'in'
 
     @staticmethod
+    def plot_acc_for_dl(history):
+
+        plt.ioff()
+        fig = plt.figure(figsize=(18, 18))
+        ax = fig.add_subplot(1, 1, 1)
+
+        ax.plot(history.history['acc'])
+        ax.plot(history.history['val_acc'])
+        plt.title('Model accuracy', fontsize=18)
+        plt.ylabel('Accuracy', fontsize=18)
+        plt.xlabel('Epoch', fontsize=18)
+        plt.ylim(0, 1)
+        plt.legend(['Train', 'Test'], loc='upper left', fontsize=18)
+
+        return fig
+
+    @staticmethod
+    def plot_loss_for_dl(history):
+
+        plt.ioff()
+        fig = plt.figure(figsize=(18, 18))
+        ax = fig.add_subplot(1, 1, 1)
+
+        ax.plot(history.history['loss'])
+        ax.plot(history.history['val_loss'])
+        plt.title('Model loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.ylim(0, 1)
+        plt.legend(['Train', 'Test'], loc='upper left')
+
+        return fig
+
+    @staticmethod
     def plot_imbalance(y1: np.ndarray, y2: np.ndarray, y1_title: str = "", y2_title: str = "", whole_title: str=""):
 
         fig, axs = plt.subplots(ncols=2, figsize=(10, 5))
@@ -131,7 +165,7 @@ class Utilities:
             ax.invert_yaxis()
             ax.xaxis.tick_top()
 
-        plt.xticks(rotation=45)
+        plt.xticks(rotation=20)
         plt.yticks(rotation=45)
 
             # resize
@@ -231,7 +265,7 @@ class Utilities:
     def plot_confusion_matrix(y_test, y_pred, index, model_name):
 
         plt.ioff()
-        fig = plt.figure(figsize=(20, 20))
+        fig = plt.figure(figsize=(36, 36))
         ax = fig.add_subplot(1, 1, 1)
 
         matrix = confusion_matrix(y_test, y_pred)

@@ -12,15 +12,15 @@ class HyperParameters:
 
     def generate_hyper_model(self, display=False):
 
-        grid = {"activation": ["tanh", "relu", "selu"],
-                "optimizer": ["sgd", "adam"],
-                "batch_size": [16, 32, 64],
-                "epoch": [20, 40]}
-
         grid = {"activation": ["relu"],
                 "optimizer": ["adam"],
-                "batch_size": [64],
-                "epoch": [10]}
+                "batch_size": [64, 128, 256],
+                "epoch": [100]}
+
+        # grid = {"activation": ["relu"],
+        #         "optimizer": ["adam"],
+        #         "batch_size": [16],
+        #         "epoch": [2]}
 
         if self.model_name == Model.lstm:
 

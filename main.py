@@ -12,6 +12,7 @@ import logging as log
 from keras.utils import to_categorical
 from keras.utils.vis_utils import plot_model
 from Classes.plot import Utilities
+from keras.callbacks import EarlyStopping
 
 
 def output_score(metric, y_true, y_pred):
@@ -68,6 +69,8 @@ class Manager:
 
         self._set_data()
 
+        self.early_stopping = EarlyStopping(monitor="val_loss", patience=3, verbose=self.verbose)
+
     def _set_data(self):
 
         # generate data folder
@@ -119,13 +122,14 @@ class Manager:
 
         for i, (fit_index, valid_index) in enumerate(sgkf.split(self.X_train, self.y_train, groups=self.subject_train)):
 
+            print("")
             print(f"Fold {i}:")
 
             X_fit, X_valid = self.X_train[fit_index], self.X_train[valid_index]
             y_fit, y_valid = self.y_train[fit_index], self.y_train[valid_index]
 
             y_fit = to_categorical(y_fit)
-            # y_valid = to_categorical(y_valid)
+            y_valid = to_categorical(y_valid)
 
             model_base = self._generate_model_base(hyper_model=hyper_model,
                                                    X_fit=X_fit,
@@ -139,11 +143,13 @@ class Manager:
             dl_model.fit(x=X_fit, y=y_fit,
                          epochs=hyper_model["epoch"],
                          batch_size=hyper_model["batch_size"],
-                         verbose=self.verbose)
+                         validation_data=(X_valid, y_valid),
+                         verbose=self.verbose,
+                         callbacks=[self.early_stopping])
 
             y_pred = dl_model.predict(X_valid)
             y_pred = np.argmax(y_pred, axis=1)
-            y_valid = y_valid.flatten()
+            y_valid = np.argmax(y_valid, axis=1)
 
             metric_score = output_score(self.metric, y_true=y_valid, y_pred=y_pred)
             scores.append(metric_score)
@@ -156,7 +162,7 @@ class Manager:
     def _test(self, hyper_model):
 
         y_train = to_categorical(self.y_train)
-        # self.y_test = to_categorical(self.y_test)
+        y_test = to_categorical(self.y_test)
 
         model_base = self._generate_model_base(hyper_model=hyper_model,
                                                X_fit=self.X_train,
@@ -169,14 +175,16 @@ class Manager:
 
         dl_model = model_base.create()
 
-        dl_model.fit(x=X_train, y=y_train,
-                     epochs=hyper_model["epoch"],
-                     batch_size=hyper_model["batch_size"],
-                     verbose=self.verbose)
+        history = dl_model.fit(x=X_train, y=y_train,
+                               epochs=hyper_model["epoch"],
+                               batch_size=hyper_model["batch_size"],
+                               verbose=self.verbose,
+                               validation_data=(X_test, y_test),
+                               callbacks=[self.early_stopping])
 
         y_pred = dl_model.predict(X_test)
         y_pred = np.argmax(y_pred, axis=1)
-        y_test = self.y_test.flatten().copy()
+        y_test = np.argmax(y_test, axis=1)
 
         score = output_score(metric=self.metric, y_true=y_test, y_pred=y_pred)
         scores.append(score)
@@ -209,6 +217,12 @@ class Manager:
         #                             figure_name=hyper_model["model_name"] + "_classification_report",
         #                             close_figure=True)
 
+        fig = self.plot_utils.plot_loss_for_dl(history=history)
+        self.plot_utils.save_figure(fig=fig,
+                                    path=self.path_figure_model,
+                                    figure_name=hyper_model["model_name"] + "_loss_history",
+                                    close_figure=True)
+
         # For plotting confusion matrix
         fig = self.plot_utils.plot_confusion_matrix(y_test=y_test,
                                                     y_pred=y_pred,
@@ -225,8 +239,10 @@ class Manager:
 
         for model_name in self.model_info.model_names:
 
-            self.path_search_model = self.pathInfo.set_path_search_model(model_name=model_name.value)
-            self.path_figure_model = self.pathInfo.set_path_figure_model(model_name=model_name.value)
+            print("SEARCH - Model name: {}".format(model_name.name))
+
+            self.path_search_model = self.pathInfo.set_path_search_model(model_name=model_name.name)
+            self.path_figure_model = self.pathInfo.set_path_figure_model(model_name=model_name.name)
             self._set_hyper(model_name=model_name)
 
             for hyper_model in self.hyper_model_list:
@@ -249,8 +265,10 @@ class Manager:
 
         for model_name in self.model_info.model_names:
 
-            self.path_search_model = self.pathInfo.set_path_search_model(model_name=model_name.value)
-            self.path_figure_model = self.pathInfo.set_path_figure_model(model_name=model_name.value)
+            print("COMPARISON - Model name: {}".format(model_name.name))
+
+            self.path_search_model = self.pathInfo.set_path_search_model(model_name=model_name.name)
+            self.path_figure_model = self.pathInfo.set_path_figure_model(model_name=model_name.name)
             self._set_hyper(model_name=model_name)
 
             metric_mean, metric_std = self._test(hyper_model=self.hyper_model_best)
@@ -284,7 +302,7 @@ def main():
     code_behaviors = [CodeBehavior.HPT, CodeBehavior.MC, CodeBehavior.MR]
     Is = code_behaviors[1:2]
 
-    N_FOLD = 2
+    N_FOLD = 3
 
     for I in Is:
 
