@@ -6,7 +6,7 @@ class PathInfo:
     def __init__(self):
 
         self.cwd = os.getcwd()
-        self.cwd = "C:\\Users\\Kenta Kamikokuryo\\Desktop\\Research\\GIT_Projects\\LSTMs_HARC"
+        # self.cwd = "C:\\Users\\Kenta Kamikokuryo\\Desktop\\Research\\GIT_Projects\\LSTMs_HARC"
         print("cwd: {0}".format(self.cwd))
 
         self._set_data_path()

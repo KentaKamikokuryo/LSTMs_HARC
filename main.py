@@ -2,7 +2,7 @@ from Classes.data import *
 from Classes.ranked import Ranked
 from ClassesML.hyperparameters import HyperParameters
 from ClassesML.factory import Factory, CodeBehaviorFactory
-from ClassesML.models import Model, ModelInfo
+from ClassesML.models import ModelName, ModelInfo
 from ClassesML.behaviors import CodeBehavior, IBehavior
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn import metrics
@@ -69,8 +69,6 @@ class Manager:
 
         self._set_data()
 
-        self.early_stopping = EarlyStopping(monitor="val_loss", patience=3, verbose=self.verbose)
-
     def _set_data(self):
 
         # generate data folder
@@ -118,6 +116,8 @@ class Manager:
 
         sgkf = StratifiedGroupKFold(n_splits=self.n_K_fold)
 
+        early_stopping = EarlyStopping(monitor="val_loss", patience=hyper_model['patience'], verbose=self.verbose)
+
         scores = []
 
         for i, (fit_index, valid_index) in enumerate(sgkf.split(self.X_train, self.y_train, groups=self.subject_train)):
@@ -145,7 +145,7 @@ class Manager:
                          batch_size=hyper_model["batch_size"],
                          validation_data=(X_valid, y_valid),
                          verbose=self.verbose,
-                         callbacks=[self.early_stopping])
+                         callbacks=[early_stopping])
 
             y_pred = dl_model.predict(X_valid)
             y_pred = np.argmax(y_pred, axis=1)
@@ -160,6 +160,8 @@ class Manager:
         return metric_score_mean, metric_score_std
 
     def _test(self, hyper_model):
+
+        early_stopping = EarlyStopping(monitor="val_loss", patience=hyper_model['patience'], verbose=self.verbose)
 
         y_train = to_categorical(self.y_train)
         y_test = to_categorical(self.y_test)
@@ -180,7 +182,7 @@ class Manager:
                                batch_size=hyper_model["batch_size"],
                                verbose=self.verbose,
                                validation_data=(X_test, y_test),
-                               callbacks=[self.early_stopping])
+                               callbacks=[early_stopping])
 
         y_pred = dl_model.predict(X_test)
         y_pred = np.argmax(y_pred, axis=1)
@@ -300,9 +302,9 @@ class Manager:
 def main():
 
     code_behaviors = [CodeBehavior.HPT, CodeBehavior.MC, CodeBehavior.MR]
-    Is = code_behaviors[1:2]
+    Is = code_behaviors[0:2]
 
-    N_FOLD = 3
+    N_FOLD = 5
 
     for I in Is:
 

@@ -1,4 +1,4 @@
-from ClassesML.models import Model, BasicLSTM, CnnLSTM, ConvLSTM
+from ClassesML.models import ModelName, BasicLSTM, CnnLSTM, ConvLSTM, BasicCNN, MultiHeadCNN
 from ClassesML.behaviors import CodeBehavior, HyperParameterTuning, ModelsComparing, ModelRunning
 import sys
 
@@ -15,23 +15,37 @@ class Factory():
 
     def create(self):
 
-        if self.model_name == Model.lstm.value:
+        if self.model_name == ModelName.lstm.value:
 
             model = BasicLSTM(hyper_model=self.hyper_model,
                               n_timesteps=self.n_timesteps,
                               n_features=self.n_features,
                               n_outputs=self.n_outputs)
 
-        elif self.model_name == Model.cnn_lstm.value:
+        elif self.model_name == ModelName.cnn_lstm.value:
 
             model = CnnLSTM(hyper_model=self.hyper_model,
                             n_timesteps=self.n_timesteps,
                             n_features=self.n_features,
                             n_outputs=self.n_outputs)
 
-        elif self.model_name == Model.conv_lstm.value:
+        elif self.model_name == ModelName.conv_lstm.value:
 
             model = ConvLSTM(hyper_model=self.hyper_model,
+                             n_timesteps=self.n_timesteps,
+                             n_features=self.n_features,
+                             n_outputs=self.n_outputs)
+
+        elif self.model_name == ModelName.multi_head_cnn.value:
+
+            model = MultiHeadCNN(hyper_model=self.hyper_model,
+                                 n_timesteps=self.n_timesteps,
+                                 n_features=self.n_features,
+                                 n_outputs=self.n_outputs)
+
+        elif self.model_name == ModelName.cnn.value:
+
+            model = BasicCNN(hyper_model=self.hyper_model,
                              n_timesteps=self.n_timesteps,
                              n_features=self.n_features,
                              n_outputs=self.n_outputs)

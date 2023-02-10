@@ -1,7 +1,7 @@
 import pandas as pd
 import itertools
 from tabulate import tabulate
-from ClassesML.models import Model
+from ClassesML.models import ModelName
 
 
 class HyperParameters:
@@ -12,27 +12,43 @@ class HyperParameters:
 
     def generate_hyper_model(self, display=False):
 
-        grid = {"activation": ["relu"],
-                "optimizer": ["adam"],
-                "batch_size": [64, 128, 256],
-                "epoch": [100]}
+        grid = {"activation": ["relu", "LeakyReLU"],
+                "batch_size": [32, 64, 128],
+                'patience': [5, 10, 15],
+                "epoch": [100],
+                'learning_rate': [0.01, 0.005, 0.001]}
 
         # grid = {"activation": ["relu"],
         #         "optimizer": ["adam"],
         #         "batch_size": [16],
         #         "epoch": [2]}
 
-        if self.model_name == Model.lstm:
+        if self.model_name == ModelName.lstm:
 
-            grid["model_name"] = [Model.lstm.value]
+            grid["model_name"] = [ModelName.lstm.value]
 
-        elif self.model_name == Model.cnn_lstm:
+        elif self.model_name == ModelName.cnn_lstm:
 
-            grid["model_name"] = [Model.cnn_lstm.value]
+            grid["model_name"] = [ModelName.cnn_lstm.value]
+            grid['kernel'] = [3, 6, 12]
+            grid['filters'] = [32, 64, 128]
 
-        elif self.model_name == Model.conv_lstm:
+        elif self.model_name == ModelName.conv_lstm:
 
-            grid["model_name"] = [Model.conv_lstm.value]
+            grid["model_name"] = [ModelName.conv_lstm.value]
+            grid['kernel'] = [3, 6, 12]
+            grid['filters'] = [32, 64, 128]
+
+        elif self.model_name == ModelName.multi_head_cnn:
+
+            grid["model_name"] = [ModelName.multi_head_cnn.value]
+            grid['filters'] = [32, 64, 128]
+
+        elif self.model_name == ModelName.cnn:
+
+            grid['model_name'] = [ModelName.cnn.value]
+            grid['kernel'] = [3, 6, 12]
+            grid['filters'] = [32, 64, 128]
 
         else:
 
