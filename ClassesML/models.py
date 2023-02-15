@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from keras.models import Sequential, Model
-from keras.layers import Dense, Flatten, Dropout, LSTM, TimeDistributed, ConvLSTM2D, Input
+from keras.layers import Dense, Flatten, Dropout, LSTM, TimeDistributed, ConvLSTM2D, Input, BatchNormalization
 from keras import optimizers
 from keras.layers.merging import concatenate
 from keras.layers.convolutional import Conv1D, MaxPooling1D
@@ -32,7 +32,7 @@ class ModelInfo():
                              ModelName.cnn_lstm,
                              ModelName.conv_lstm]
 
-        # self._model_names = [ModelName.cnn]
+        # self._model_names = [ModelName.conv_lstm]
 
     @property
     def model_names(self):
@@ -159,9 +159,18 @@ class BasicLSTM(IModel):
         adam = optimizers.Adam(learning_rate=self.hyper_model['learning_rate'])
 
         model = Sequential()
-        model.add(LSTM(100, input_shape=(self.n_timesteps, self.n_features)))
-        model.add(Dropout(0.5))
-        model.add(Dense(100, activation=self.hyper_model["activation"]))
+        model.add(LSTM(self.hyper_model["nodes"], input_shape=(self.n_timesteps, self.n_features)))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
+        model.add(Dense(128, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
+        model.add(Dense(64, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer=adam)
         # model.summary()
@@ -190,13 +199,22 @@ class CnnLSTM(IModel):
         model = Sequential()
         model.add(TimeDistributed(Conv1D(filters=int(self.hyper_model['filters']), kernel_size=int(self.hyper_model['kernel']), activation=self.hyper_model["activation"]),
                                   input_shape=(None, self.n_length, self.n_features)))
-        model.add(TimeDistributed(Conv1D(filters=int(self.hyper_model['filters']), kernel_size=int(self.hyper_model['kernel']), activation=self.hyper_model["activation"])))
-        model.add(TimeDistributed(Dropout(0.5)))
+        model.add(TimeDistributed(Dropout(self.hyper_model["dropout_rate"])))
         model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
         model.add(TimeDistributed(Flatten()))
-        model.add(LSTM(100))
-        model.add(Dropout(.5))
-        model.add(Dense(100, activation=self.hyper_model["activation"]))
+
+        model.add(LSTM(self.hyper_model["nodes"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
+        model.add(Dense(128, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
+        model.add(Dense(64, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
         model.add(Dense(self.n_outputs, activation="softmax"))
         model.compile(loss="categorical_crossentropy", optimizer=adam)
         # model.summary()
@@ -229,9 +247,18 @@ class ConvLSTM(IModel):
         model = Sequential()
         model.add(ConvLSTM2D(filters=self.hyper_model['filters'], kernel_size=(1, self.hyper_model['kernel']), activation=self.hyper_model["activation"],
                              input_shape=(self.n_splits, 1, self.n_length, self.n_features)))
-        model.add(Dropout(0.5))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
         model.add(Flatten())
-        model.add(Dense(100, activation=self.hyper_model["activation"]))
+
+        model.add(Dense(128, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
+        model.add(Dense(64, activation=self.hyper_model["activation"]))
+        model.add(BatchNormalization())
+        model.add(Dropout(self.hyper_model["dropout_rate"]))
+
         model.add(Dense(self.n_outputs, activation='softmax'))
         model.compile(loss="categorical_crossentropy", optimizer=adam)
         # model.summary()

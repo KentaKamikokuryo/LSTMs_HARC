@@ -20,7 +20,7 @@ class Data:
         # one hot encode y
         # self._one_hot_encode()
 
-        self._class_names = ["Walking", "Walking Upstairs", "Waking Downstairs",
+        self._class_names = ["Walking", "Upstairs", "Downstairs",
                              "Sitting", "Standing", "Laying"]
 
     def _one_hot_encode(self):

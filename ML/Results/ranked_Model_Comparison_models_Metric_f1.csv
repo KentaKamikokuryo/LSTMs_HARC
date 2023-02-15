@@ -1,0 +1,4 @@
+,activation,batch_size,dropout_rate,patience,epoch,learning_rate,model_name,kernel,filters,nodes,mean,std
+0,relu,32,0.3,15,100,0.001,ConvLSTM,6.0,64.0,64,0.9389928879599466,0.0
+1,relu,32,0.3,10,100,0.001,CNN-LSTM,6.0,64.0,128,0.9263588129016307,0.0
+2,relu,64,0.5,15,100,0.005,LSTM,,,128,0.9162419758378147,0.0

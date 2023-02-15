@@ -14,7 +14,7 @@ class Utilities:
         sns.set(style='ticks', rc={"grid.linewidth": 0.1})
         sns.set_context("paper", font_scale=1.7)
         color = sns.color_palette("Set2", 6)
-        plt.rcParams['font.family'] = 'MS Gothic'
+        plt.rcParams['font.family'] = 'Times New Roman'
         plt.rcParams['xtick.direction'] = 'in'
         plt.rcParams['ytick.direction'] = 'in'
 

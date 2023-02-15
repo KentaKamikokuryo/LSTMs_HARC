@@ -302,7 +302,7 @@ class Manager:
 def main():
 
     code_behaviors = [CodeBehavior.HPT, CodeBehavior.MC, CodeBehavior.MR]
-    Is = code_behaviors[0:2]
+    Is = code_behaviors[1:2]
 
     N_FOLD = 5
 

@@ -32,6 +32,10 @@ class PathInfo:
         if not (os.path.exists(self._folder_ML)):
             os.makedirs(self._folder_ML)
 
+        self._path_csv = self._folder_ML + "csv_files\\"
+        if not (os.path.exists(self._path_csv)):
+            os.makedirs(self._path_csv)
+
         self._path_figure = self._folder_ML + "Figures\\"
         if not (os.path.exists(self._path_figure)):
             os.makedirs(self._path_figure)
@@ -87,6 +91,14 @@ class PathInfo:
     @property
     def path_figure(self):
         return self._path_figure
+
+    @property
+    def path_ml(self):
+        return self._folder_ML
+
+    @property
+    def path_csv(self):
+        return self._path_csv
 
 
 class Utilities:
